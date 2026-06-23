@@ -4,55 +4,8 @@ Agente de carga automática de workload (worklogs) a Jira Cloud, construido con 
 
 ## Diagrama de flujo
 
-```mermaid
-flowchart TD
-    DM["Usuario · DM de Slack (prod)"] --> AGENT
-    TUIUSER["Usuario · TUI de eve (local)"] --> AGENT
-    CRON["Schedule semanal<br/>cron Lun 10:00 AR"] -->|"un usuario por turno"| AGENT
+<img width="1672" height="941" alt="diagram" src="https://github.com/user-attachments/assets/1869a67d-b1c9-409a-b100-d66794a49684" />
 
-    AGENT["Agente eve · gpt-4.1<br/>(agent/instructions.md)"]
-
-    AGENT --> READ
-    AGENT -.->|"propone tool de escritura"| GATE
-
-    subgraph READ["Tools de lectura · sin aprobación"]
-        direction LR
-        T1["user_has_config"]
-        T2["preview_week_load"]
-        T3["get_my_worklogs"]
-        T4["get_user_config · get_holidays"]
-    end
-
-    GATE{"Aprobación humana<br/>(botones Slack / y·n en TUI)"}
-    GATE -->|aprobado| WRITE
-    GATE -->|rechazado| STOP["No se escribe nada"]
-
-    subgraph WRITE["Tools de escritura"]
-        direction LR
-        W1["set_user_config"]
-        W2["set_uniform_plan"]
-        W3["load_worklogs"]
-    end
-
-    READ --> LIB
-    WRITE --> LIB
-
-    subgraph LIB["agent/lib · lógica de dominio"]
-        direction LR
-        L1["users"]
-        L2["workdays · buildWeek"]
-        L3["jira"]
-        L4["holidays"]
-        L5["hibob (opcional)"]
-    end
-
-    L1 --> REDIS[("Upstash Redis<br/>config + cachés")]
-    L2 --> L4
-    L2 --> L5
-    L3 --> JIRA[["Jira Cloud · REST v3"]]
-    L4 --> AR[["argentinadatos.com"]]
-    L5 --> HIBOB[["HiBob · whosout"]]
-```
 
 ## Cómo funciona
 
